@@ -624,6 +624,167 @@ $
 
 ----------------------------------------------------------------------------------------------------------------------
 
+Q: 在 mac 上的虚拟机是 Virtualization.Framework, 请问我能直接使用 Virtualization.Framework 在 mac 上创建虚拟机吗? 请列出详细步骤, 同时列出管理这些虚拟机的详细操作
+
+答案是: 可以, 但有前提.
+
+`Virtualization.framework`(简称 VZ)是 Apple 在 macOS 系统内核之上提供的一套底层开发框架(Swift / Objective-C API).
+
+macOS 系统并没有预装类似 `vz create` 或 `vz run` 这样的终端开箱即用命令行工具. 如果你想直接使用它, 主要有两种途径:
+
+1. 开发者原生方式(最硬核): 直接编写 Swift 程序调用 `import Virtualization`, 自签名权限后运行.
+2. 轻量 CLI 工具方式(最实用): 使用专门为 Virtualization.framework 打造的"纯薄层"命令行工具(其中最成熟、最流行的是 `Tart`, 它是 100% 基于 Virtualization.framework 构建的 CLI).
+
+下面分别介绍这两种方式的具体操作和管理流程.
+
+---
+
+### 方案一: 使用原生 Swift 代码直接调用(底层纯粹方式)
+
+如果你希望不依赖任何第三方管理工具, 完全靠 macOS 原生能力拉起虚拟机, 你可以通过 Swift 编写一个轻量启动器.
+
+#### 1. 准备虚拟机镜像
+
+以 Linux 为例, 先下载一个 cloud 镜像(如 Ubuntu), 或解压出 Linux 内核 `vmlinuz` 和 `initrd` 文件.
+
+#### 2. 编写 Swift 虚拟机启动脚本
+
+创建文件 `RunVM.swift`:
+
+```swift
+import Foundation
+import Virtualization
+
+// 1. 创建 VM 配置
+let config = VZVirtualMachineConfiguration()
+config.cpuCount = 2
+config.memorySize = 4 * 1024 * 1024 * 1024 // 4GB 内存
+
+// 2. 配置引导程序 (此处以 Linux EFI 为例)
+let efi = VZEFIBootLoader()
+efi.variableStore = VZEFIVariableStore(creatingVariableStoreAt: URL(fileURLWithPath: "nvram.bin"))
+config.bootLoader = efi
+
+// 3. 配置磁盘
+let diskURL = URL(fileURLWithPath: "disk.img")
+let diskAttachment = try! VZDiskImageStorageDeviceAttachment(url: diskURL, readOnly: false)
+let storageDevice = VZVirtioBlockDeviceConfiguration(attachment: diskAttachment)
+config.storageDevices = [storageDevice]
+
+// 4. 配置 NAT 网络
+let network = VZVirtioNetworkDeviceConfiguration()
+network.attachment = VZNATNetworkDeviceAttachment()
+config.networkDevices = [network]
+
+// 5. 校验配置
+try! config.validate()
+
+// 6. 实例化并启动
+let vm = VZVirtualMachine(configuration: config)
+
+Task {
+    try! await vm.start()
+    print("Virtual Machine running via Virtualization.framework!")
+}
+
+RunLoop.main.run()
+```
+
+#### 3. 赋予虚拟化权限并编译执行
+
+macOS 强制要求调用 Virtualization.framework 的二进制程序必须包含特定权限(Entitlement):
+
+1. 创建 `entitlements.plist` 文件:
+
+```xml
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+    <key>com.apple.security.virtualization</key>
+    <true/>
+</dict>
+</plist>
+
+```
+
+2. 编译并使用 Ad-hoc 证书自签名:
+
+```bash
+swiftc -framework Virtualization RunVM.swift -o run_vm
+codesign --force --sign - --entitlements entitlements.plist run_vm
+```
+
+3. 运行虚拟机:
+
+```bash
+./run_vm
+```
+
+* 管理操作: 在这种模式下, 虚拟机的生命周期必须在 Swift 代码中由你自己调用 `vm.pause()`、`vm.resume()`、`vm.stop()` 等 API 控制.
+
+---
+
+### 方案二: 使用 Tart 命令行(推荐: 业界标准的 VZ 原生 CLI)
+
+如果你需要的是类似 Docker/Lima 的便捷命令行体验, 但底层只想完全使用 `Virtualization.framework`, 那么由 Cirrus Labs 开发的 Tart 是目前最佳选择. 它是专门给 macOS 原生虚拟化做的一层极薄的命令行封装, 无任何 QEMU 依赖.
+
+#### 1. 安装 Tart
+
+```bash
+brew install cirruslabs/cli/tart
+```
+
+#### 2. 创建并运行虚拟机
+
+##### 场景 A: 运行一个 Linux 虚拟机(极速秒级拉起)
+
+Tart 提供了现成的 OCI 格式系统镜像:
+
+```bash
+# 从远程拉取预制镜像克隆为本地虚拟机
+tart clone ghcr.io/cirruslabs/ubuntu:latest my-ubuntu
+
+# 启动虚拟机(--no-graphics 表示无界面后台运行, 适合终端使用)
+tart run my-ubuntu --no-graphics
+```
+
+##### 场景 B: 运行一个完整的 macOS 虚拟机(Virtualization.framework 的独家特长)
+
+如果你想在 Mac 上虚拟化出另一个 macOS:
+
+```bash
+# 自动从 Apple CDN 下载最新 IPSW 恢复固件并安装
+tart create --from-ipsw=latest my-macos
+
+# 启动并显示图形界面
+tart run my-macos
+```
+
+---
+
+### 三、 使用 Tart 管理 Virtualization.framework 虚拟机的详细操作
+
+| 管理操作 | 命令 | 说明 |
+| :--- | :--- | :--- |
+| 列出所有虚拟机 | `tart list` | 查看本地所有基于 VZ 的虚拟机及占用空间大小 |
+| 启动虚拟机 | `tart run <VM_NAME>` | 启动并打开原生 Cocoa 图形窗口 |
+| 无头模式启动 (CLI/SSH) | `tart run <VM_NAME> --no-graphics` | 仅作为终端/后台服务运行 |
+| 查看虚拟机 IP 地址 | `tart ip <VM_NAME>` | 读取 VZ 分配给该虚拟机的内网 IP |
+| SSH 登录 | `tart ssh <VM_NAME>` | 直接免密登录进入虚拟机(Linux 默认用户通常是 admin) |
+| 修改虚拟机硬件配置 | `tart set <VM_NAME> --cpu 4 --memory 8192` | 动态调整分配的 CPU 核心数与内存 (MB) |
+| 挂载共享目录 | `tart run --dir=work:~/my-project <VM_NAME>` | 基于 VirtioFS 高性能挂载宿主机目录 |
+| 停止虚拟机 | 在控制终端按 `Ctrl + C`, 或在虚拟机内执行 `sudo poweroff` | 优雅关机 |
+| 删除虚拟机 | `tart delete <VM_NAME>` | 清理释放本地磁盘空间 |
+
+---
+
+### 总结
+
+* `Virtualization.framework` 是一组 API 而不是一个命令.
+* 你之前用的 Colima、Lima 以及上文提到的 Tart, 底层实际上全都在调用 `Virtualization.framework`.
+* 如果你想免去配置 Docker/K8s 的额外服务, 纯粹跑一个由 macOS 原生虚拟化驱动的 Linux 或 macOS 虚拟机, 直接使用 `tart` 是效率最高、最贴近 VZ 框架本质的命令行操作方式.
+
 ----------------------------------------------------------------------------------------------------------------------
 
 ----------------------------------------------------------------------------------------------------------------------
