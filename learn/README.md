@@ -885,6 +885,145 @@ Q: colima start 启动虚拟机之后, 虚拟机的网络是怎么设置的?
 
 ----------------------------------------------------------------------------------------------------------------------
 
+Q: 我使用 colima 启动虚拟机之后, 我拉取镜像, 发现DNS或者网络有问题. 如下所示:
+```bash
+$ colima start
+INFO[0000] starting colima
+INFO[0000] runtime: docker
+INFO[0000] creating and starting ...                     context=vm
+INFO[0001] downloading disk image ...                    context=vm
+INFO[0218] provisioning ...                              context=docker
+INFO[0220] starting ...                                  context=docker
+INFO[0221] done
+$ docker pull python:3.12.15
+Error response from daemon: failed to resolve reference "docker.io/library/python:3.12.15": failed to do request: Head "https://registry-1.docker.io/v2/library/python/manifests/3.12.15": dial tcp: lookup registry-1.docker.io on [::1]:53: read udp [::1]:60250->[::1]:53: read: connection refused
+```
+我应该如何排查并且解决这个问题
+
+这个错误非常典型, 核心原因一目了然: DNS 地址解析指向了错误的回环地址(IPv6 localhost `[::1]`).
+
+```bash
+lookup registry-1.docker.io on [::1]:53: read udp [::1]:60250->[::1]:53: read: connection refused
+```
+
+---
+
+### 一、为什么会出现这个问题?
+
+1. 宿主机配置干扰:
+   Colima (Lima) 默认会从你的 macOS 宿主机读取网络配置, 并把宿主机的 DNS 复制到虚拟机内.
+
+2. 本地代理 / 梯子 / 局域网服务残留:
+   如果你的 Mac 上运行了代理软件(如 Clash、Surge、Sing-box 等开启了增强模式/Tun 模式), 或者你配置过本地 DNS(如 dnsmasq), macOS 会把当前系统的 DNS 指向 `127.0.0.1` 或 `::1`(本机的 localhost).
+
+3. 虚拟机内的灾难:
+   当这个配置被同步到虚拟机内的 `/etc/resolv.conf` 时, 虚拟机去请求 `[::1]:53`, 它实际是在查询虚拟机自己的 53 端口. 而虚拟机内部根本没有运行任何 DNS 服务, 因此直接抛出 `connection refused`(连接被拒绝).
+
+---
+
+### 二、排查验证(确认病因)
+
+你可以通过进入 Colima 内部一秒验证这个猜测:
+
+```bash
+# 1. SSH 进入 Colima 虚拟机
+colima ssh
+
+# 2. 查看虚拟机里的 DNS 解析配置
+cat /etc/resolv.conf
+```
+
+你很可能会在输出里看到 `nameserver ::1` 或 `nameserver 127.0.0.1`.
+
+测试解析公网:
+
+```bash
+nslookup registry-1.docker.io
+```
+
+同样会报 connection refused. 执行 `exit` 退出虚拟机.
+
+---
+
+### 三、解决方案
+
+#### 方案一: 启动 Colima 时显式指定公共 DNS(最推荐、最彻底)
+
+不需要让 Colima 盲目继承 Mac 本地的虚拟 DNS, 直接强制指定可靠的公共 DNS 服务器:
+
+```bash
+# 1. 停止当前虚拟机
+colima stop
+
+# 2. 指定公共 DNS 启动(国内推荐阿里 DNS/腾讯 DNS; 海外推荐 8.8.8.8 / 1.1.1.1)
+colima start --dns 223.5.5.5 --dns 119.29.29.29 --dns 8.8.8.8
+```
+
+> 持久化配置(避免每次敲命令):
+> 打开 Colima 的默认配置文件:
+> ```bash
+> colima start --edit
+> ```
+> 找到 `dns: []` 配置项, 修改为:
+> ```yaml
+> dns:
+>   - 223.5.5.5
+>   - 8.8.8.8
+> ```
+> 保存退出后即可永久生效.
+
+---
+
+#### 方案二: 如果使用了网络代理(VPN / 科学上网)
+
+由于 Docker Hub(`docker.io`)在国内网络环境下即使 DNS 正常也经常被阻断或超时, 如果你本身 Mac 上开了代理, 推荐让 Colima 的流量也走你的代理:
+
+1. 确认 Mac 代理软件开启了 "允许局域网连接"(Allow LAN), 并记下 HTTP/SOCKS 端口(例如 `7890`).
+2. 在 Colima 启动时注入代理环境(虚拟机访问宿主机使用专用域名 `host.lima.internal`):
+
+```bash
+colima stop
+
+colima start \
+  --dns 8.8.8.8 \
+  --env HTTP_PROXY="http://host.lima.internal:7890" \
+  --env HTTPS_PROXY="http://host.lima.internal:7890"
+```
+
+---
+
+#### 方案三: 临时快速测试(无需重启 Colima)
+
+如果你正在运行其他东西不想重启虚拟机, 可以临时手动改一下虚拟机里的 resolv.conf:
+
+```bash
+colima ssh -- sudo sh -c 'echo "nameserver 223.5.5.5\nnameserver 8.8.8.8" > /etc/resolv.conf'
+```
+
+修改后立即测试:
+
+```bash
+docker pull python:3.12-slim
+```
+
+(注意: 此修改在 Colima 重启后会被覆盖, 长久生效建议用[方案一])
+
+---
+
+### 四、补充提示
+
+修复完 DNS 之后, 注意你的镜像标签:
+
+官方 Python 镜像版本目前只有形如 `3.12`、`3.12.8`、`3.12-slim` 等; Python 官方至今并没有发布过 `3.12.15` 这个版本(3.12 还没有迭代到 .15).
+
+建议使用合法的现有版本测试拉取, 例如:
+
+```bash
+docker pull python:3.12
+# 或者更轻量的版本
+docker pull python:3.12-slim
+```
+
 ----------------------------------------------------------------------------------------------------------------------
 
 ----------------------------------------------------------------------------------------------------------------------
