@@ -1026,7 +1026,497 @@ docker pull python:3.12-slim
 
 ----------------------------------------------------------------------------------------------------------------------
 
+Q: 我使用 colima 启动虚拟机, 详细的日志如下所示:
+```bash
+$ colima start \
+--dns 223.5.5.5 \
+--dns 119.29.29.29 \
+--dns 8.8.8.8 \
+--env HTTP_PROXY="http://host.lima.internal:7890" \
+--env HTTPS_PROXY="http://host.lima.internal:7890" \
+--verbose \
+--very-verbose
+
+TRAC[0000] cmd ["limactl" "info"]
+TRAC[0000] cmd ["system_profiler" "-json" "SPHardwareDataType"]
+TRAC[0000] cmd ["limactl" "list" "colima" "--json"]
+TRAC[0000] error retrieving running instance: error retrieving instance: exit status 1
+INFO[0000] starting colima
+TRAC[0000] starting with config file: /Users/huzhi/.colima/default/colima.yaml
+INFO[0000] runtime: docker
+INFO[0000] creating and starting ...                     context=vm
+TRAC[0000] cmd ["system_profiler" "-json" "SPHardwareDataType"]
+TRAC[0000] cmd ["limactl" "disk" "list" "--json" "colima"]
+INFO[0000] downloading disk image ...                    context=vm
+TRAC[0046] cmd ["limactl" "list" "--json"]
+TRAC[0046] cmd ["limactl" "start" "--tty=false" "/var/folders/4f/gy92m6hd2xj3c6_yz0dht6880000gn/T/colima.yaml"]
+> Terminal is not available, proceeding without opening an editor
+> vmType vz: On Intel Mac, macOS 15.5 or later is required to run Linux 6.12 or later. Update macOS, or change vmType to `qemu` if the VM does not start up. (https://github.com/lima-vm/lima/issues/3334)
+> Replacing `http_proxy` value `http://127.0.0.1:7890` with `http://192.168.5.2:7890`
+> Replacing `https_proxy` value `http://127.0.0.1:7890` with `http://192.168.5.2:7890`
+> Changing `HTTP_PROXY` value from `http://host.lima.internal:7890` to `http://192.168.5.2:7890` to match `http_proxy`
+> Changing `HTTPS_PROXY` value from `http://host.lima.internal:7890` to `http://192.168.5.2:7890` to match `https_proxy`
+> Starting the instance `colima` with internal VM driver `vz`
+> vmType vz: On Intel Mac, macOS 15.5 or later is required to run Linux 6.12 or later. Update macOS, or change vmType to `qemu` if the VM does not start up. (https://github.com/lima-vm/lima/issues/3334)
+> vmType vz: On Intel Mac, macOS 15.5 or later is required to run Linux 6.12 or later. Update macOS, or change vmType to `qemu` if the VM does not start up. (https://github.com/lima-vm/lima/issues/3334)
+> "Attempting to download the image" arch=x86_64 digest= location=/Users/huzhi/Library/Caches/colima/caches/5bfdf1067a8e288910a570fb8c6edbb2340ab7bbc09d2133d64ced3c888a78ed
+> Decompressing the image (5bfdf1067a8e288910a570fb8c6edbb2340ab7bbc09d2133d64ced3c888a78ed)
+> decompressing  with external "gzip"
+> Downloaded the image from `/Users/huzhi/Library/Caches/colima/caches/5bfdf1067a8e288910a570fb8c6edbb2340ab7bbc09d2133d64ced3c888a78ed`
+> Resize instance colima's disk from 3.5GiB to 20GiB
+> [hostagent] vmType vz: On Intel Mac, macOS 15.5 or later is required to run Linux 6.12 or later. Update macOS, or change vmType to `qemu` if the VM does not start up. (https://github.com/lima-vm/lima/issues/3334)
+> [hostagent] Replacing `http_proxy` value `http://127.0.0.1:7890` with `http://192.168.5.2:7890`
+> [hostagent] Replacing `https_proxy` value `http://127.0.0.1:7890` with `http://192.168.5.2:7890`
+> [hostagent] Changing `HTTP_PROXY` value from `http://host.lima.internal:7890` to `http://192.168.5.2:7890` to match `http_proxy`
+> [hostagent] Changing `HTTPS_PROXY` value from `http://host.lima.internal:7890` to `http://192.168.5.2:7890` to match `https_proxy`
+> [hostagent] Replacing `http_proxy` value `http://127.0.0.1:7890` with `http://192.168.5.2:7890`
+> [hostagent] Replacing `https_proxy` value `http://127.0.0.1:7890` with `http://192.168.5.2:7890`
+> [hostagent] Changing `HTTP_PROXY` value from `http://host.lima.internal:7890` to `http://192.168.5.2:7890` to match `http_proxy`
+> [hostagent] Changing `HTTPS_PROXY` value from `http://host.lima.internal:7890` to `http://192.168.5.2:7890` to match `https_proxy`
+> [hostagent] hostagent socket created at /Users/huzhi/.colima/_lima/colima/ha.sock
+> [hostagent] Starting VZ (hint: to watch the boot progress, see `/Users/huzhi/.colima/_lima/colima/serial*.log`)
+> [hostagent] Mounting disk `colima` on `/mnt/lima-colima`
+> [hostagent] Converting `/Users/huzhi/.colima/_lima/_disks/colima/datadisk` (raw) to a raw disk `/Users/huzhi/.colima/_lima/_disks/colima/datadisk`
+> [hostagent] [VZ] - vm state change: running
+> [hostagent] SSH server does not seem to be running on vsock port, using usernet forwarder
+> SSH Local Port: 54552
+> [hostagent] Waiting for the essential requirement 1 of 3: `ssh`
+> [hostagent] The essential requirement 1 of 3 is satisfied
+> [hostagent] Waiting for the essential requirement 2 of 3: `user session is ready for ssh`
+> [hostagent] The essential requirement 2 of 3 is satisfied
+> [hostagent] Waiting for the essential requirement 3 of 3: `Explicitly start ssh ControlMaster`
+> [hostagent] The essential requirement 3 of 3 is satisfied
+> [hostagent] Waiting for the guest agent to be running
+> [hostagent] Forwarding `/var/run/docker.sock` (guest) to `/Users/huzhi/.colima/default/docker.sock` (host)
+> [hostagent] Forwarding `/var/run/containerd/containerd.sock` (guest) to `/Users/huzhi/.colima/default/containerd.sock` (host)
+> [hostagent] Forwarding `/var/run/docker.sock` (guest) to `/Users/huzhi/.colima/docker.sock` (host)
+> [hostagent] Guest agent is running
+> [hostagent] Time sync: guest agent is alive, starting time synchronization
+> [hostagent] Waiting for the final requirement 1 of 1: `boot scripts must have finished`
+> [hostagent] Not forwarding TCP 0.0.0.0:22
+> [hostagent] Not forwarding TCP [::]:22
+> [hostagent] Time sync: guest clock adjusted (was -316ms off)
+> READY. Run `limactl shell colima` to open the shell.
+TRAC[0229] cmd ["lima" "sh" "-c" "apt list | grep 'dnsmasq\\/' | grep '\\[installed'"]
+TRAC[0230] cmd ["lima" "command" "-v" "binfmt"]
+TRAC[0230] cmd ["lima" "sh" "-c" "sudo QEMU_PRESERVE_ARGV0=1 /usr/bin/binfmt --install 386,arm64"]
+> installing: 386 OK
+> installing: arm64 OK
+> {
+>   "supported": [
+>     "linux/amd64",
+>     "linux/arm64",
+>     "linux/386"
+>   ],
+>   "emulators": [
+>     "python3.12",
+>     "qemu-aarch64",
+>     "qemu-i386"
+>   ]
+> }
+INFO[0230] provisioning ...                              context=docker
+TRAC[0230] cmd ["lima" "sudo" "stat" "-c" "%s,%a,%Y,%F" "/etc/containerd/config.colima.bak.toml"]
+TRAC[0230] cmd ["lima" "sudo" "cp" "/etc/containerd/config.toml" "/etc/containerd/config.colima.bak.toml"]
+TRAC[0231] cmd ["lima" "sudo" "mkdir" "-p" "/etc/containerd"]
+TRAC[0231] cmd int ["lima" "sudo" "sh" "-c" "cat > /etc/containerd/config.toml"]
+TRAC[0231] cmd ["lima" "sudo" "systemctl" "restart" "containerd.service"]
+TRAC[0231] cmd ["lima" "sh" "-c" "grep 'host.lima.internal' /etc/hosts | awk -F' ' '{print $1}'"]
+TRAC[0231] cmd ["lima" "sudo" "mkdir" "-p" "/etc/docker"]
+TRAC[0231] cmd int ["lima" "sudo" "sh" "-c" "cat > /etc/docker/daemon.json"]
+TRAC[0231] cmd ["lima" "sh" "-c" "grep 'host.lima.internal' /etc/hosts | awk -F' ' '{print $1}'"]
+TRAC[0231] cmd ["lima" "sudo" "mkdir" "-p" "/etc/systemd/system/docker.service.d"]
+TRAC[0231] cmd int ["lima" "sudo" "sh" "-c" "cat > /etc/systemd/system/docker.service.d/docker.conf"]
+TRAC[0232] cmd ["lima" "sudo" "systemctl" "daemon-reload"]
+TRAC[0232] cmd ["lima" "sudo" "systemctl" "restart" "docker.service"]
+TRAC[0232] cmd ["docker" "context" "inspect" "colima"]
+TRAC[0233] cmd ["docker" "context" "create" "colima" "--description" "colima" "--docker" "host=unix:///Users/huzhi/.colima/default/docker.sock"]
+> colima
+> Successfully created context "colima"
+TRAC[0233] cmd ["docker" "context" "use" "colima"]
+> colima
+> Current context is now "colima"
+INFO[0233] starting ...                                  context=docker
+TRAC[0233] cmd ["lima" "sudo" "systemctl" "start" "docker.service"]
+TRAC[0233] cmd ["lima" "sudo" "docker" "info"]
+TRAC[0233] cmd ["lima" "docker" "info"]
+TRAC[0233] cmd ["lima" "sudo" "cat" "/etc/colima/colima.json"]
+TRAC[0233] error reading config file: cannot read file '/etc/colima/colima.json': error running [lima sudo cat /etc/colima/colima.json], output: "cat: /etc/colima/colima.json: No such file or directory", err: "exit status 1"  context=vm
+TRAC[0233] cmd ["lima" "sudo" "mkdir" "-p" "/etc/colima"]
+TRAC[0234] cmd ["lima" "sudo" "mkdir" "-p" "/etc/colima"]
+TRAC[0234] cmd int ["lima" "sudo" "sh" "-c" "cat > /etc/colima/colima.json"]
+TRAC[0234] cmd ["lima" "sudo" "cat" "/etc/colima/colima.json"]
+TRAC[0234] cmd ["lima" "sudo" "mkdir" "-p" "/etc/colima"]
+TRAC[0234] cmd ["lima" "sudo" "mkdir" "-p" "/etc/colima"]
+TRAC[0234] cmd int ["lima" "sudo" "sh" "-c" "cat > /etc/colima/colima.json"]
+INFO[0234] done
+TRAC[0234] cmd ["limactl" "list" "--json"]
+
+$ colima list
+PROFILE    STATUS     ARCH      CPUS    MEMORY    DISK      RUNTIME    ADDRESS
+default    Running    x86_64    2       2GiB      100GiB    docker
+$
+```
+请根据上述日志, 说明一下几点:
+1、详细说明上述日志中每条输出的含义
+2、结合日志说明 colima 启动虚拟机的详细过程
+
+这份日志非常详尽, 完整记录了 Colima 从环境自检、虚拟机拉起、网络与代理改写、Docker 服务配置到宿主机客户端接管的全生命周期.
+
+下面分两个部分为你深入剖析: 第 1 部分逐条拆解日志含义, 第 2 部分串联总结启动全流程.
+
+---
+
+### 第一部分: 日志关键条目逐条深度解析
+
+我们可以把这份日志划分为 6 个阶段:
+
+#### 阶段 1: 环境检测与状态自检(耗时约 0 秒)
+
+* `TRAC[0000] cmd ["limactl" "info"]`
+  调用底层 `limactl` 检查 Lima 的版本和支持的虚拟化能力.
+
+* `TRAC[0000] cmd ["system_profiler" "-json" "SPHardwareDataType"]`
+  调用 macOS 原生系统命令, 获取你当前电脑的硬件配置(从后续日志看, 识别出这是一台 Intel x86_64 架构的 Mac).
+
+* `TRAC[0000] cmd ["limactl" "list" "colima" "--json"]`
+  检查名为 `colima` 的虚拟机是否已经在运行.
+
+* `TRAC[0000] error retrieving running instance: ... exit status 1`
+  发现不存在运行中的实例, 确认需要执行首次创建或冷启动.
+
+* `TRAC[0000] starting with config file: .../colima.yaml`
+  加载位于你个人目录下的基础配置文件.
+
+#### 阶段 2: 镜像处理与网络参数转译(0~46 秒)
+
+* `TRAC[0046] cmd ["limactl" "start" "--tty=false" "/var/folders/.../colima.yaml"]`
+  Colima 生成了一份临时的 Lima YAML 配置文件, 正式调用 Lima 启动引擎.
+
+* `> vmType vz: On Intel Mac, macOS 15.5 or later is required to run Linux 6.12 or later...`
+  兼容性提示: 检测到你在 Intel Mac 上启用了 Apple 原生 `vz` 虚拟化, 提示如果内核过新可能需要升级 macOS 或退回 `qemu` 模式.
+
+* `> Replacing http_proxy value http://127.0.0.1:7890 with http://192.168.5.2:7890`
+* `> Changing HTTP_PROXY value from http://host.lima.internal:7890 to http://192.168.5.2:7890`
+  核心网络转换: 因为宿主机的 `127.0.0.1` 在虚拟机内部不可直接访问, Lima 自动识别出内部虚拟网关 IP 为 `192.168.5.2`, 并将你在命令行传入的代理地址自动重写为虚拟机可直达宿主机的 IP.
+
+* `> Downloading / Decompressing the image (5bfdf106...)`
+  下载/提取预先构建好的 Linux Alpine/Ubuntu 基础镜像.
+
+* `> Resize instance colima's disk from 3.5GiB to 20GiB`
+  将基础系统的根磁盘扩容到初始化大小.
+
+#### 阶段 3: 底层虚拟化启动与通道建立(46~229 秒)
+
+* `> [hostagent] hostagent socket created at .../ha.sock`
+  在 macOS 宿主机端启动守护进程(hostagent), 用于维持与虚拟机的控制通信.
+
+* `> [hostagent] Starting VZ ...`
+  正式调用 macOS 的 `Virtualization.framework` 启动 Linux 内核.
+
+* `> [hostagent] [VZ] - vm state change: running`
+  底层硬件虚拟化完成, Linux 虚拟机进入运行态.
+
+* `> SSH Local Port: 54552`
+  Lima 在 macOS 宿主机上开启 `54552` 端口, 作为 SSH 隧道映射虚拟机的 22 端口.
+
+* `> [hostagent] Waiting for the essential requirement 1/2/3: ssh ... satisfied`
+  等待虚拟机系统内部的 SSH 服务就绪, 并通过 SSH ControlMaster 建立持久长连接.
+
+* `> [hostagent] Forwarding /var/run/docker.sock (guest) to .../default/docker.sock (host)`
+  关键步骤(Socket 桥接): 把虚拟机内部 Docker 服务的 UNIX Socket, 透传并映射到 macOS 的 `~/.colima/default/docker.sock`.
+
+* `> [hostagent] Time sync: guest clock adjusted (was -316ms off)`
+  校准虚拟机时钟, 与 Mac 宿主机时钟同步(防止因虚拟机时间偏差导致 SSL 证书验证失败).
+
+#### 阶段 4: 跨架构环境配置(229~230 秒)
+
+* `TRAC[0230] cmd ["lima" "sh" "-c" "sudo QEMU_PRESERVE_ARGV0=1 /usr/bin/binfmt --install 386,arm64"]`
+  在虚拟机内注册 `binfmt_misc` 内核模块.
+
+* `> "supported": ["linux/amd64", "linux/arm64", "linux/386"]`
+  虽然你的电脑是 Intel(amd64), 但 Colima 贴心地为你注入了 QEMU 用户态模拟器, 使得这台虚拟机未来也能运行 ARM64 架构的容器.
+
+#### 阶段 5: Docker Daemon 配置与代理注入(230~233 秒)
+
+* `TRAC[0231] cmd int ["lima" "sudo" "sh" "-c" "cat > /etc/docker/daemon.json"]`
+  往虚拟机内的 `/etc/docker/daemon.json` 写入配置(包括你传入的 DNS: `223.5.5.5`、`119.29.29.29`、`8.8.8.8`).
+
+* `TRAC[0231] cmd int ["lima" "sudo" "sh" "-c" "cat > /etc/systemd/system/docker.service.d/docker.conf"]`
+  配置 Docker 代理: 向 systemd 写入环境变量配置, 将 `HTTP_PROXY=http://192.168.5.2:7890` 注入到 Docker 守护进程中, 确保虚拟机拉取镜像走代理.
+
+* `TRAC[0232] cmd ["lima" "sudo" "systemctl" "restart" "docker.service"]`
+  重载并重启虚拟机内部的 Docker 服务, 使配置生效.
+
+#### 阶段 6: 宿主机 Docker 接管与完成(233~234 秒)
+
+* `TRAC[0233] cmd ["docker" "context" "create" "colima" ...]`
+
+* `TRAC[0233] cmd ["docker" "context" "use" "colima"]`
+  在 macOS 宿主机上创建并切换 Docker 上下文, 将 Docker CLI 默认通信指向刚才映射出来的 Socket.
+
+* `INFO[0234] done`
+  启动流程全部完毕.
+
+---
+
+### 第二部分: Colima 启动虚拟机的详细过程(流程架构)
+
+结合上述日志, Colima 从执行 `colima start` 到返回 `done` 的完整机制可概括为 5 个阶段:
+
+```bash
+ ┌────────────────────────────────────────────────────────────────────────┐
+ │ 1. 宿主机准备阶段                                                       │
+ │    • 检查机器硬件(识别为 Intel x86_64)                                │
+ │    • 读取用户参数(DNS、Proxy), 生成临时 Lima 配置文件                 │
+ │    • 将用户输入的 localhost/内部域名 智能改写为网关 IP (192.168.5.2)    │
+ └───────────────────────────────────┬────────────────────────────────────┘
+                                     ▼
+ ┌────────────────────────────────────────────────────────────────────────┐
+ │ 2. 虚拟机拉起阶段 (Hypervisor)                                          │
+ │    • 释放解压基础 Linux 镜像并扩容虚拟磁盘 (20GB)                       │
+ │    • 调用 Apple 原生 Virtualization.framework (VZ) 启动 Linux 内核     │
+ └───────────────────────────────────┬────────────────────────────────────┘
+                                     ▼
+ ┌────────────────────────────────────────────────────────────────────────┐
+ │ 3. 通信与通道建立 (Hostagent & Network)                                │
+ │    • 宿主机开启高位端口(如 54552)建立 SSH 免密通信隧道                │
+ │    • 开启 Socket 转发: 把虚拟机的 docker.sock 穿透映射到 macOS 本地     │
+ │    • 宿主机与虚拟机时钟同步对齐                                         │
+ └───────────────────────────────────┬────────────────────────────────────┘
+                                     ▼
+ ┌────────────────────────────────────────────────────────────────────────┐
+ │ 4. 虚拟机内部服务调优 (Provisioning)                                    │
+ │    • 注册 binfmt, 安装 arm64 QEMU 模拟器以支持跨架构容器                │
+ │    • 配置 systemd: 将 HTTP_PROXY / HTTPS_PROXY 注入 Docker 服务进程      │
+ │    • 配置 daemon.json: 将指定的公共 DNS (223.5.5.5 等) 写入配置         │
+ │    • 重启虚拟机内的 containerd 和 dockerd 进程                          │
+ └───────────────────────────────────┬────────────────────────────────────┘
+                                     ▼
+ ┌────────────────────────────────────────────────────────────────────────┐
+ │ 5. 宿主机接管 (CLI Handover)                                           │
+ │    • 在 macOS 注册并激活名为 colima 的 docker context                   │
+ │    • 用户在 Mac 敲下的 `docker` 指令直接经由 Socket 发入该虚拟机        │
+ └────────────────────────────────────────────────────────────────────────┘
+```
+
+### 💡 结论与反馈
+
+从这份详细日志可以证实:
+
+1. 你的 DNS 与代理设置已经成功注入: 日志中明确记录了系统将代理重写为 `http://192.168.5.2:7890`, 并已成功写入虚拟机 systemd 的 `docker.conf`.
+2. 之前的 DNS 拒绝错误已经被解决: 虚拟机不再向回环地址 `[::1]` 请求解析, 而是能通过代理或新的 DNS 服务器直接对外通信. 现在你可以放心执行 `docker pull` 了.
+
 ----------------------------------------------------------------------------------------------------------------------
+
+Q: 我使用默认的参数启动虚拟机, 日志如下所示:
+```bash
+$ colima start \
+--verbose \
+--very-verbose
+TRAC[0000] cmd ["limactl" "info"]
+TRAC[0000] cmd ["system_profiler" "-json" "SPHardwareDataType"]
+TRAC[0000] cmd ["limactl" "list" "colima" "--json"]
+TRAC[0000] error retrieving running instance: error retrieving instance: exit status 1
+INFO[0000] starting colima
+TRAC[0000] starting with config file: /Users/huzhi/.colima/default/colima.yaml
+INFO[0000] runtime: docker
+INFO[0000] creating and starting ...                     context=vm
+TRAC[0000] cmd ["system_profiler" "-json" "SPHardwareDataType"]
+TRAC[0000] cmd ["limactl" "disk" "list" "--json" "colima"]
+INFO[0000] downloading disk image ...                    context=vm
+TRAC[0115] cmd ["limactl" "list" "--json"]
+TRAC[0115] cmd ["limactl" "start" "--tty=false" "/var/folders/4f/gy92m6hd2xj3c6_yz0dht6880000gn/T/colima.yaml"]
+> Terminal is not available, proceeding without opening an editor
+> vmType vz: On Intel Mac, macOS 15.5 or later is required to run Linux 6.12 or later. Update macOS, or change vmType to `qemu` if the VM does not start up. (https://github.com/lima-vm/lima/issues/3334)
+> Replacing `http_proxy` value `http://127.0.0.1:7890` with `http://192.168.5.2:7890`
+> Replacing `https_proxy` value `http://127.0.0.1:7890` with `http://192.168.5.2:7890`
+> Starting the instance `colima` with internal VM driver `vz`
+> vmType vz: On Intel Mac, macOS 15.5 or later is required to run Linux 6.12 or later. Update macOS, or change vmType to `qemu` if the VM does not start up. (https://github.com/lima-vm/lima/issues/3334)
+> vmType vz: On Intel Mac, macOS 15.5 or later is required to run Linux 6.12 or later. Update macOS, or change vmType to `qemu` if the VM does not start up. (https://github.com/lima-vm/lima/issues/3334)
+> "Attempting to download the image" arch=x86_64 digest= location=/Users/huzhi/Library/Caches/colima/caches/5bfdf1067a8e288910a570fb8c6edbb2340ab7bbc09d2133d64ced3c888a78ed
+> Decompressing the image (5bfdf1067a8e288910a570fb8c6edbb2340ab7bbc09d2133d64ced3c888a78ed)
+> decompressing  with external "gzip"
+> Downloaded the image from `/Users/huzhi/Library/Caches/colima/caches/5bfdf1067a8e288910a570fb8c6edbb2340ab7bbc09d2133d64ced3c888a78ed`
+> Resize instance colima's disk from 3.5GiB to 20GiB
+> [hostagent] vmType vz: On Intel Mac, macOS 15.5 or later is required to run Linux 6.12 or later. Update macOS, or change vmType to `qemu` if the VM does not start up. (https://github.com/lima-vm/lima/issues/3334)
+> [hostagent] Replacing `http_proxy` value `http://127.0.0.1:7890` with `http://192.168.5.2:7890`
+> [hostagent] Replacing `https_proxy` value `http://127.0.0.1:7890` with `http://192.168.5.2:7890`
+> [hostagent] Replacing `http_proxy` value `http://127.0.0.1:7890` with `http://192.168.5.2:7890`
+> [hostagent] Replacing `https_proxy` value `http://127.0.0.1:7890` with `http://192.168.5.2:7890`
+> [hostagent] hostagent socket created at /Users/huzhi/.colima/_lima/colima/ha.sock
+> [hostagent] Starting VZ (hint: to watch the boot progress, see `/Users/huzhi/.colima/_lima/colima/serial*.log`)
+> [hostagent] Mounting disk `colima` on `/mnt/lima-colima`
+> [hostagent] Converting `/Users/huzhi/.colima/_lima/_disks/colima/datadisk` (raw) to a raw disk `/Users/huzhi/.colima/_lima/_disks/colima/datadisk`
+> [hostagent] [VZ] - vm state change: running
+> [hostagent] SSH server does not seem to be running on vsock port, using usernet forwarder
+> SSH Local Port: 65533
+> [hostagent] Waiting for the essential requirement 1 of 3: `ssh`
+> [hostagent] The essential requirement 1 of 3 is satisfied
+> [hostagent] Waiting for the essential requirement 2 of 3: `user session is ready for ssh`
+> [hostagent] The essential requirement 2 of 3 is satisfied
+> [hostagent] Waiting for the essential requirement 3 of 3: `Explicitly start ssh ControlMaster`
+> [hostagent] The essential requirement 3 of 3 is satisfied
+> [hostagent] Waiting for the guest agent to be running
+> [hostagent] Forwarding `/var/run/docker.sock` (guest) to `/Users/huzhi/.colima/default/docker.sock` (host)
+> [hostagent] Forwarding `/var/run/containerd/containerd.sock` (guest) to `/Users/huzhi/.colima/default/containerd.sock` (host)
+> [hostagent] Forwarding `/var/run/docker.sock` (guest) to `/Users/huzhi/.colima/docker.sock` (host)
+> [hostagent] Guest agent is running
+> [hostagent] Time sync: guest agent is alive, starting time synchronization
+> [hostagent] Waiting for the final requirement 1 of 1: `boot scripts must have finished`
+> [hostagent] Not forwarding TCP 0.0.0.0:22
+> [hostagent] Not forwarding TCP [::]:22
+> [hostagent] The final requirement 1 of 1 is satisfied
+> READY. Run `limactl shell colima` to open the shell.
+TRAC[0294] cmd ["lima" "sh" "-c" "apt list | grep 'dnsmasq\\/' | grep '\\[installed'"]
+TRAC[0295] cmd ["lima" "command" "-v" "binfmt"]
+TRAC[0295] cmd ["lima" "sh" "-c" "sudo QEMU_PRESERVE_ARGV0=1 /usr/bin/binfmt --install 386,arm64"]
+> installing: 386 OK
+> installing: arm64 OK
+> {
+>   "supported": [
+>     "linux/amd64",
+>     "linux/arm64",
+>     "linux/386"
+>   ],
+>   "emulators": [
+>     "python3.12",
+>     "qemu-aarch64",
+>     "qemu-i386"
+>   ]
+> }
+INFO[0295] provisioning ...                              context=docker
+TRAC[0295] cmd ["lima" "sudo" "stat" "-c" "%s,%a,%Y,%F" "/etc/containerd/config.colima.bak.toml"]
+TRAC[0295] cmd ["lima" "sudo" "cp" "/etc/containerd/config.toml" "/etc/containerd/config.colima.bak.toml"]
+TRAC[0295] cmd ["lima" "sudo" "mkdir" "-p" "/etc/containerd"]
+TRAC[0295] cmd int ["lima" "sudo" "sh" "-c" "cat > /etc/containerd/config.toml"]
+TRAC[0296] cmd ["lima" "sudo" "systemctl" "restart" "containerd.service"]
+TRAC[0296] cmd ["lima" "sudo" "mkdir" "-p" "/etc/docker"]
+TRAC[0296] cmd int ["lima" "sudo" "sh" "-c" "cat > /etc/docker/daemon.json"]
+TRAC[0296] cmd ["lima" "sh" "-c" "grep 'host.lima.internal' /etc/hosts | awk -F' ' '{print $1}'"]
+TRAC[0296] cmd ["lima" "sudo" "mkdir" "-p" "/etc/systemd/system/docker.service.d"]
+TRAC[0296] cmd int ["lima" "sudo" "sh" "-c" "cat > /etc/systemd/system/docker.service.d/docker.conf"]
+TRAC[0296] cmd ["lima" "sudo" "systemctl" "daemon-reload"]
+TRAC[0296] cmd ["lima" "sudo" "systemctl" "restart" "docker.service"]
+TRAC[0297] cmd ["docker" "context" "inspect" "colima"]
+TRAC[0297] cmd ["docker" "context" "create" "colima" "--description" "colima" "--docker" "host=unix:///Users/huzhi/.colima/default/docker.sock"]
+> colima
+> Successfully created context "colima"
+TRAC[0297] cmd ["docker" "context" "use" "colima"]
+> colima
+> Current context is now "colima"
+INFO[0297] starting ...                                  context=docker
+TRAC[0297] cmd ["lima" "sudo" "systemctl" "start" "docker.service"]
+TRAC[0297] cmd ["lima" "sudo" "docker" "info"]
+TRAC[0298] cmd ["lima" "docker" "info"]
+TRAC[0298] cmd ["lima" "sudo" "cat" "/etc/colima/colima.json"]
+TRAC[0298] error reading config file: cannot read file '/etc/colima/colima.json': error running [lima sudo cat /etc/colima/colima.json], output: "cat: /etc/colima/colima.json: No such file or directory", err: "exit status 1"  context=vm
+TRAC[0298] cmd ["lima" "sudo" "mkdir" "-p" "/etc/colima"]
+TRAC[0298] cmd ["lima" "sudo" "mkdir" "-p" "/etc/colima"]
+TRAC[0298] cmd int ["lima" "sudo" "sh" "-c" "cat > /etc/colima/colima.json"]
+TRAC[0298] cmd ["lima" "sudo" "cat" "/etc/colima/colima.json"]
+TRAC[0299] cmd ["lima" "sudo" "mkdir" "-p" "/etc/colima"]
+TRAC[0299] cmd ["lima" "sudo" "mkdir" "-p" "/etc/colima"]
+TRAC[0299] cmd int ["lima" "sudo" "sh" "-c" "cat > /etc/colima/colima.json"]
+INFO[0299] done
+TRAC[0299] cmd ["limactl" "list" "--json"]
+$
+```
+两次启动虚拟机的参数不同, 主要和网络相关, 根据两次启动的日志. 请详细分析一下问题:
+1、两次启动过程有什么不同?
+2、两次启动都有如下内容:
+```bash
+> Replacing `http_proxy` value `http://127.0.0.1:7890` with `http://192.168.5.2:7890`
+> Replacing `https_proxy` value `http://127.0.0.1:7890` with `http://192.168.5.2:7890`
+```
+为什么会使用到我本地 vpn 的相关设置, 7890 这个端口就和我本地的 vpn 有关? 为什么 colima 启动虚拟机还和 vpn 相关?
+
+这两份日志非常具有代表性, 它们直观地展现了 Lima/Colima 在处理宿主机环境变量和网络智能映射时的底层机制.
+
+针对你的两个疑问, 详细拆解如下:
+
+---
+
+### 问题 1: 两次启动过程有什么不同?
+
+虽然两次最终都成功拉起了虚拟机并配置了 Docker, 但比对日志细节, 核心差异集中在 "参数注入" 和 "临时端口分配" 上:
+
+| 对比维度 | 第一次启动(带参数) | 第二次启动(默认参数) | 日志证据与技术原因 |
+| :--- | :--- | :--- | :--- |
+| 代理环境变量的处理 | 多了一次从 `host.lima.internal` 到真实 IP 的二次规整 | 没有二次规整, 直接替换 | 第一次你显式传入了 `--env HTTP_PROXY="http://host.lima.internal:7890"`, 日志中多出了: <br> `> Changing HTTP_PROXY value from http://host.lima.internal:7890 to http://192.168.5.2:7890 to match http_proxy`; <br> 第二次没有传这个参数, 因此没有这条日志. |
+| DNS 与 Daemon 配置 | `/etc/docker/daemon.json` 注入了自定义 DNS | 写入的是默认 Docker 配置 | 第一次你传入了 `--dns 223.5.5.5 ...`, Colima 在执行 `cat > /etc/docker/daemon.json` 时, 把这些 DNS IP 写入了 Docker 引擎配置; 第二次则遵循默认. |
+| 宿主机 SSH 本地端口 | `SSH Local Port: 54552` | `SSH Local Port: 65533` | 宿主机与虚拟机通信需要建立 SSH 隧道, 这个端口是 macOS 宿主机每次启动时在未被占用的高位端口中随机挑选的. |
+
+---
+
+### 问题 2: 为什么默认启动仍出现 7890 端口? 它和本地 VPN 是什么关系?
+
+日志中的这两行关键输出揭示了原因:
+
+```bash
+> Replacing `http_proxy` value `http://127.0.0.1:7890` with `http://192.168.5.2:7890`
+> Replacing `https_proxy` value `http://127.0.0.1:7890` with `http://192.168.5.2:7890`
+```
+
+`7890` 是国内非常普遍的代理工具(如 Clash、Sing-box、V2Ray 等)默认的本地 HTTP/SOCKS 混合监听端口.
+
+之所以默认启动还会抓取到它, 原因包含以下三个层面:
+
+#### 1. 为什么 Colima 会知道 7890 端口?
+
+它自动继承了你当前 Mac 终端(Shell)的环境变量.
+Lima/Colima 在启动时, 会去读取你 macOS 当前终端中的环境变量. 如果你的 Mac 终端里已经存在了代理变量, Lima 会无条件继承它们.
+
+你可以现在在你的 Mac 终端里执行以下命令验证:
+
+```bash
+env | grep -i proxy
+```
+
+你一定会看到类似下面的输出:
+
+```bash
+http_proxy=http://127.0.0.1:7890
+https_proxy=http://127.0.0.1:7890
+HTTP_PROXY=http://127.0.0.1:7890
+HTTPS_PROXY=http://127.0.0.1:7890
+```
+> 这些变量通常来源于:
+> * 你的 `~/.zshrc` 或 `~/.bash_profile` 里曾经写过 `export http_proxy=...`;
+> * 或者你的 VPN 软件开启了"终端代理/快捷导入命令", 导致当前打开的终端自动注入了这几个变量.
+>
+
+#### 2. 为什么 Colima 默认要把代理带进虚拟机?
+
+这是 Lima/Colima 的人性化设计(开箱即用理念):
+
+* 开发者在 Mac 终端里开发时, 通常需要代理才能顺利拉取 GitHub 代码、下载国外依赖包等.
+* 如果虚拟机内部"与世隔绝"不继承宿主机的代理, 用户往往会遇到虚拟机内 `apt update` 失败、`docker pull` 超时等各种被墙的问题.
+* 因此, Lima 的默认策略是: 尽量让虚拟机内部的网络环境与你的宿主机终端保持一致.
+
+#### 3. 为什么要把 `127.0.0.1` 替换成 `192.168.5.2`? (关键技术原理)
+
+这也是日志里打印 `Replacing ...` 的核心原因:
+
+* `127.0.0.1` 是回环地址(Localhost):
+  * 在 macOS 宿主机上, `127.0.0.1:7890` 指的是 Mac 物理机上运行的 VPN 软件.
+  * 但如果 Lima 把这个值原封不动塞进 Linux 虚拟机, 虚拟机在发请求时就会去连虚拟机自己内部的 7890 端口. 而虚拟机里根本没有 VPN 软件, 网络会瞬间彻底瘫痪(`Connection Refused`).
+* 智能 IP 改写:
+  * Lima 在虚拟网络中扮演网关角色, 在虚拟机内部眼中, 宿主机 macOS 的网关 IP 是 `192.168.5.2`.
+  * 所以 Lima 非常聪明地在启动时自动把 `127.0.0.1` 偷换成了 `192.168.5.2`, 这样虚拟机发出的代理请求就能精准穿透回 Mac 宿主机的 VPN 软件上.
+
+---
+
+### 验证与扩展
+
+如果你不想让 Colima 自动走你的 VPN 代理, 可以在启动前临时清空终端的环境变量, 让它进行一次真正的"纯直连"启动:
+
+```bash
+# 临时清空当前终端的代理变量
+unset http_proxy https_proxy HTTP_PROXY HTTPS_PROXY all_proxy ALL_PROXY
+
+# 再次启动, 日志中就不会再出现任何 Replacing 7890 的提示
+colima start --verbose
+```
 
 ----------------------------------------------------------------------------------------------------------------------
 
